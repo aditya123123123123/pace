@@ -1,0 +1,19 @@
+{
+  "name": "pace-speed-reader",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Speed reader (RSVP) for PDFs, scans, images and documents. OCR runs in the browser.",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5310",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 5311"
+  },
+  "devDependencies": {
+    "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "mammoth": "^1.13.0",
+    "pdfjs-dist": "^6.4.299",
+    "tesseract.js": "^7.0.0"
+  }
+}

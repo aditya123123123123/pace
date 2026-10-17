@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)" />
+  <title>Pace — speed reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- ============ HOME ============ -->
+  <main id="home" class="view home" aria-labelledby="home-title">
+    <header class="topbar">
+      <div class="brand"><span class="brand-dot" aria-hidden="true"></span>Pace</div>
+      <button class="icon-btn" id="theme-toggle-home" aria-label="Toggle dark mode">
+        <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+
+    <section class="home-col">
+      <h1 id="home-title">Read anything,<br />one word at a time.</h1>
+      <p class="lede">Drop in a PDF, a photo of a page, or any document. Pace pulls out the text and plays it back at the speed you choose. Everything stays on your device.</p>
+
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-describedby="dz-hint">
+        <div class="dz-idle">
+          <span class="dz-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z M14 3v5h5 M12 17v-6 M9.5 13.5 12 11l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <p class="dz-title">Drop a file to start reading</p>
+          <p class="dz-hint" id="dz-hint">PDF, images, DOCX, TXT or Markdown<br />Scanned pages are read with OCR</p>
+          <button class="btn btn-primary" id="choose-btn" type="button">Choose file</button>
+        </div>
+        <div class="dz-busy" hidden>
+          <p class="dz-file" id="busy-name">document.pdf</p>
+          <p class="dz-status" id="busy-status">Extracting text…</p>
+          <div class="bar" aria-hidden="true"><div class="bar-fill" id="busy-bar"></div></div>
+          <button class="btn btn-ghost btn-sm" id="cancel-btn" type="button">Cancel</button>
+        </div>
+        <input type="file" id="file-input" accept=".pdf,.txt,.md,.markdown,.docx,.png,.jpg,.jpeg,.webp,.bmp,.gif,.tif,.tiff,.html,.htm,.rtf,application/pdf,text/*,image/*" hidden />
+      </div>
+      <p class="error" id="error" role="alert" hidden></p>
+      <button class="link sample-link" id="sample-btn" type="button">No file handy? Try a sample passage →</button>
+
+      <details class="paste" id="paste">
+        <summary>Or paste text</summary>
+        <textarea id="paste-text" rows="6" placeholder="Paste an article, notes, an essay…"></textarea>
+        <div class="paste-row">
+          <span class="muted" id="paste-count">0 words</span>
+          <button class="btn btn-primary btn-sm" id="paste-go" type="button" disabled>Start reading</button>
+        </div>
+      </details>
+
+      <section class="recents" id="recents" hidden aria-label="Recent documents">
+        <h2>Continue reading</h2>
+        <ul id="recent-list"></ul>
+      </section>
+
+    </section>
+
+    <footer class="credit">
+      Built by <a href="https://www.adityajhalani.com/" target="_blank" rel="noopener">Aditya Jhalani</a>
+    </footer>
+  </main>
+
+  <!-- ============ READER ============ -->
+  <main id="reader" class="view reader" hidden aria-label="Speed reader">
+    <header class="topbar reader-top">
+      <button class="icon-btn" id="back-btn" aria-label="Back to library">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="doc-title" id="doc-title">Untitled</div>
+      <div class="top-actions">
+        <button class="pill-btn" id="skip-btn" aria-label="Choose parts to skip" title="Choose parts to skip (S)">
+          <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M4 6h16M4 18h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 12h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="1.5 3.5"/><path d="M17 15.5l3 2.5-3 2.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="pill-label">Skip parts</span><span class="pill-count" id="skip-count" hidden></span>
+        </button>
+        <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode">
+          <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+        <button class="icon-btn" id="settings-btn" aria-label="Display settings" aria-expanded="false" aria-controls="settings">
+          <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="16" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="popover settings" id="settings" hidden role="dialog" aria-label="Display settings">
+      <div class="set-row">
+        <span>Text size</span>
+        <div class="seg" id="size-seg">
+          <button data-v="s">S</button><button data-v="m">M</button><button data-v="l">L</button><button data-v="xl">XL</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <span>Words per flash</span>
+        <div class="seg" id="chunk-seg">
+          <button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <span>Pause on punctuation</span>
+        <label class="switch"><input type="checkbox" id="punct-toggle" checked /><span></span></label>
+      </div>
+      <div class="set-row">
+        <span>Highlight focus letter</span>
+        <label class="switch"><input type="checkbox" id="orp-toggle" checked /><span></span></label>
+      </div>
+    </div>
+
+    <section class="stage" id="stage" aria-live="off">
+      <div class="skip-chip" id="skip-chip" hidden role="status">
+        <span id="skip-chip-text">Found page headers</span>
+        <button class="chip-btn primary" id="skip-chip-yes" type="button">Skip all</button>
+        <button class="chip-btn" id="skip-chip-review" type="button">Review</button>
+        <button class="icon-btn sm" id="skip-chip-no" type="button" aria-label="Dismiss">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <p class="skip-toast" id="skip-toast" aria-hidden="true"></p>
+      <div class="reticle" aria-hidden="true"><span class="tick top"></span><span class="tick bottom"></span></div>
+      <div class="word" id="word"><span class="w-left"></span><span class="w-pivot"></span><span class="w-right"></span></div>
+      <p class="stage-hint" id="stage-hint">Press <kbd>Space</kbd> to start</p>
+      <div class="context" id="context" hidden></div>
+    </section>
+
+    <footer class="dock" id="dock">
+      <div class="scrub-row">
+        <span class="time" id="t-done">0%</span>
+        <button class="page-btn" id="page-btn" type="button" hidden aria-haspopup="dialog" aria-controls="pager" title="Show pages (P)">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="4" y="3.5" width="11" height="14" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 20.5h9.2a1.8 1.8 0 0 0 1.8-1.8V8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span><b id="page-num">1</b><span class="page-of"> / <span id="page-of">1</span></span></span>
+        </button>
+        <div class="scrub-wrap">
+          <input type="range" id="scrub" min="0" max="100" value="0" step="1" aria-label="Position in document" />
+          <div class="skipmarks" id="skipmarks" aria-hidden="true"></div>
+          <span class="scrub-tip" id="scrub-tip" aria-hidden="true"></span>
+        </div>
+        <span class="time right" id="t-left">—</span>
+      </div>
+      <div class="ctrl-row">
+        <div class="wpm" role="group" aria-label="Reading speed">
+          <button class="icon-btn sm" id="wpm-down" aria-label="Slower">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <button class="wpm-val" id="wpm-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="speed"><b id="wpm-num">300</b> wpm</button>
+          <button class="icon-btn sm" id="wpm-up" aria-label="Faster">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 12h12M12 6v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="transport">
+          <button class="icon-btn" id="prev-btn" aria-label="Previous sentence" title="Previous sentence (←)">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="play" id="play-btn" aria-label="Play">
+            <svg class="i-play" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+            <svg class="i-pause" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1" fill="currentColor"/><rect x="13.9" y="5" width="3.6" height="14" rx="1" fill="currentColor"/></svg>
+          </button>
+          <button class="icon-btn" id="next-btn" aria-label="Next sentence" title="Next sentence (→)">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="keys" aria-hidden="true"><span><kbd>Space</kbd>play</span><span><kbd>←</kbd><kbd>→</kbd>sentence</span><span><kbd>↑</kbd><kbd>↓</kbd>speed</span><span><kbd>S</kbd>skip</span><span id="key-pages" hidden><kbd>P</kbd>pages</span></div>
+      </div>
+
+      <div class="popover speed" id="speed" hidden role="dialog" aria-label="Reading speed">
+        <div class="speed-head"><span>Speed</span><b><span id="speed-num">300</span> wpm</b></div>
+        <input type="range" id="wpm-range" min="100" max="1200" step="10" value="300" aria-label="Words per minute" />
+        <div class="presets" id="presets">
+          <button data-v="200">200</button><button data-v="300">300</button><button data-v="400">400</button><button data-v="500">500</button><button data-v="700">700</button><button data-v="900">900</button>
+        </div>
+        <p class="muted small">Average reading is ~250 wpm. Most people stay comfortable up to 400–500.</p>
+      </div>
+    </footer>
+
+    <!-- skip editor: the whole document as text; tap paragraphs / select words to skip -->
+    <section class="skipper" id="skipper" hidden role="dialog" aria-modal="true" aria-labelledby="skipper-title">
+      <header class="skipper-top">
+        <div>
+          <h2 id="skipper-title">Choose what to skip</h2>
+          <p class="muted small" id="skipper-help">Tap a paragraph to skip it. Select words to skip just those.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="skipper-done" type="button">Done</button>
+      </header>
+      <div class="skipper-sugg" id="skipper-sugg" hidden>
+        <span id="skipper-sugg-text"></span>
+        <button class="chip-btn" id="skipper-sugg-btn" type="button">Skip all</button>
+      </div>
+      <div class="skipper-body" id="skipper-body"></div>
+      <footer class="skipper-bar">
+        <div class="sel-actions" id="sel-actions" hidden>
+          <button class="btn btn-primary btn-sm" id="sel-skip" type="button">Skip selection</button>
+          <button class="btn btn-ghost btn-sm" id="sel-keep" type="button">Keep selection</button>
+        </div>
+        <span class="muted small" id="skipper-stat">Nothing skipped</span>
+        <button class="link" id="skipper-clear" type="button">Clear all</button>
+      </footer>
+    </section>
+
+    <!-- page navigator: the PDF's real pages; tap one to continue reading from it -->
+    <section class="skipper pager" id="pager" hidden role="dialog" aria-modal="true" aria-labelledby="pager-title">
+      <header class="skipper-top">
+        <div>
+          <h2 id="pager-title">Pages</h2>
+          <p class="muted small" id="pager-sub">Tap a page to jump there</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="pager-done" type="button">Done</button>
+      </header>
+      <p class="pager-note muted small" id="pager-note" hidden>Previews show for PDFs opened from now on. Re-open the file to see its pages.</p>
+      <div class="pager-grid" id="pager-grid"></div>
+    </section>
+  </main>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
