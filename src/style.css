@@ -73,6 +73,13 @@ kbd {
   display: inline-block; padding: 12px 0; margin: -12px 0; /* 44px-tall touch target */
 }
 .credit a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.credit-sep { margin: 0 8px; }
+.credit-part { white-space: nowrap; }
+@media (max-width: 359px) {
+  .credit-part { display: block; }
+  .credit-part + .credit-part { margin-top: 10px; }
+  .credit-sep { display: none; }
+}
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px max(20px, env(safe-area-inset-left)) 18px max(20px, env(safe-area-inset-right));
